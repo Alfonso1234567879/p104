@@ -1,7 +1,9 @@
-//calse maquina
-#ifndef MAQUINA_H
+//calse maquina#ifndef MAQUINA_H
 #define MAQUINA_H
-
+#include <string>
+#include <cstdlib>
+#include <iostream>
+using namespace std;
 class Maquina{
     private:
         string ID_maquina_;
