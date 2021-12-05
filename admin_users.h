@@ -8,9 +8,9 @@ class AdminUsers:public Admin{
 
 	public:
 		AdminUsers(string idadmin,string dni,string contrasena):Admin(idadmin,dni,contrasena);
-		bool addUsuario();
-		int moodUsuario();
-		void deleteUsuario();
+		bool addUsuario(Usuario a);
+		int moodUsuario(Usuario a);
+		void deleteUsuario(Usuario a);
 		
 };
 #endif
