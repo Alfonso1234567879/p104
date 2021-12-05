@@ -1,9 +1,9 @@
 //usuario clase
-
 #ifndef USUARIO
 #define USUARIO
 #include<cstdlib>
 #include<string>
+#include"persona.h"
 using namespace std;
 class Usuario:public Persona{
 	private:
@@ -12,7 +12,7 @@ class Usuario:public Persona{
 		Usuario(string idusuario,string dni,string contrasena):Persona(dni,contrasena){
 			setId(idusuario);
 		}
-		inline void setId(sting cad){idusuario_=cad;}
-		inline string getId(){return idsuario_;}
+		inline void setId(string cad){idusuario_=cad;}
+		inline string getId(){return idusuario_;}
 };
 #endif
