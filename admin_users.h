@@ -13,6 +13,9 @@ class AdminUsers:public Admin{
 		bool addUsuario(Usuario a);
 		int moodUsuario(Usuario a);
 		void deleteUsuario(Usuario a);
+		bool addAdmin(Admin a);
+		int moodAdmin(Admin a);
+		void deleteAdmin(Admin a);
 		
 };
 #endif
