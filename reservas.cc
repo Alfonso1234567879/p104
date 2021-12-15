@@ -179,7 +179,7 @@ int compruebareservaescorrecta(Usuario a,Maquina x,int cantidadareservardenucleo
 					return(1);
 				}
 				else{
-					ofstream fich3("maquinasyrecursosdisponibles");
+					ofstream fich3("maquinasyrecursosdisponibles.txt");
 					return(-10);//no existe el fichero maquinas y recursos disponibles
 				}
 			}
