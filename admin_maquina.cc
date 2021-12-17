@@ -5,15 +5,62 @@
 #include"admin_maquina.h"
 using namespace std;
 
+int maxcantidadrams=7;//cantidad maxima de rams que puede reservar un usuario
+int maxcantidadnucleos=6;
+
+int comprobaridnoexistee(string id){
+	string nom="maquinas.txt";
+	ifstream fich(nom);
+	string cad1,cad2,cad3;
+	if(fich.is_open()){
+		while(getline(fich,cad1,',')){
+			if(cad1==id){
+				fich.close();
+				return(-1);//error por existencia de id
+			}
+			getline(fich,cad2,',');
+			getline(fich,cad3,'\n');
+		}
+	}
+	return(1);//id correcto
+	fich.close();
+}
+
+int nlineasss(string nom){
+	ifstream fich(nom);
+	int n=0;
+	string cad;
+	while(getline(fich,cad)){
+		n++;
+	}
+	return n;
+}
+
 bool AdminMaq::addMaq(Maquina a){
+	int checkid;
+	checkid=comprobaridnoexistee(a.getID_maquina());
+	if(a.getNucleos()>maxcantidadnucleos){
+		cout<<"Error, esta introduciendo un numero mayor de nucleos al limite de nucleos establecido en el sistema\n"<<endl;
+		return false;
+	}
+	if(a.getRams()>maxcantidadrams){
+		cout<<"Error, esta introduciendo un numero mayor de rams al limite de rams establecido en el sistema\n"<<endl;
+		return false;
+	}
+	if(checkid!=1){
+		cout<<"La maquina con el id introducido ya existe\n"<<endl;
+		return false;
+	}
 	string nom="maquinas.txt";
 	//formato:idmaquina,nucleos,rams \n
 	ifstream fich(nom);
+	int nlin=nlineasss(nom);
 	string cad1,cad2,cad3;
 	if(fich.is_open()){
 		string nom2="temporal.txt";
 		ofstream fich2(nom2);
-		while(getline(fich,cad1,',')){
+		for(int i=0;i<nlin;i++){
+			getline(fich,cad1,',');
 			if(cad1==a.getID_maquina()){
 				fich.close();
 				fich2.close();
@@ -22,40 +69,23 @@ bool AdminMaq::addMaq(Maquina a){
 			}
 			getline(fich,cad2,',');
 			getline(fich,cad3,'\n');
-			fich2<<cad1+','<<cad2+','<<cad3+'\n'<<endl;
+			fich2<<cad1+','<<cad2+','<<cad3<<endl;
 		}	
+		fich2<<a.getID_maquina()+','<<a.getNucleos()<<','<<a.getRams()<<endl;
 		fich.close();
 		fich2.close();
 		remove(nom.c_str());
 		rename(nom2.c_str(),nom.c_str());
+		cout<<"Maquina anadida con exito\n"<<endl;
 		return true;
 	}
 	else{
 		ofstream fich(nom);
-		fich<<a.getID_maquina()+','<<a.getNucleos()+','<<a.getRams()+'\n'<<endl;
+		fich<<a.getID_maquina()+','<<a.getNucleos()+','<<a.getRams()<<endl;
 		fich.close();
 		return true;
 	}
 }
-
-int comprobaridnoexiste(string id){
-	string nom="maquinas.txt";
-	ifstream fich(nom);
-	string cad;
-	if(fich.is_open()){
-		while(getline(fich,cad,',')){
-			getline(fich,cad,',');
-			if(cad==id){
-				fich.close();
-				return(-1);//error por existencia de id
-			}
-			getline(fich,cad,'\n');
-		}
-	}
-	return(1);//id correcto
-	fich.close();
-}
-
 
 int AdminMaq::moodMaq(Maquina a){
 	string nom="maquinas.txt";
@@ -78,7 +108,7 @@ int AdminMaq::moodMaq(Maquina a){
 				if(respuesta==1){
 				cout<<"Ha escogido modificar id, introduzca el nuevo id\n"<<endl;
 				cin>>cad1;
-				while((comprobaridnoexiste(cad1))!=1){
+				while((comprobaridnoexistee(cad1))!=1){
 					cout<<"Id incorrecto, vuelva a introducirlo\n"<<endl;
 					cin>>cad1;
 				}
