@@ -11,247 +11,182 @@ int maxcantnucleos=6;//cantidad maxima de nucleos que puede reservar un usuario
 int comprobaridusuarioexiste(string id){
 	string nom="usuarios.txt";
 	ifstream fich(nom);
-	string cad;
+	string cad1,cad2,cad3;
 	if(fich.is_open()){
-		while(getline(fich,cad,',')){
-			getline(fich,cad,',');
-			if(cad==id){
+		while(getline(fich,cad1,',')){
+			if(cad1==id){
 				fich.close();
 				return(1);
 			}
-			getline(fich,cad,'\n');
+			getline(fich,cad2,',');
+			getline(fich,cad3,'\n');
 		}
 	}
-	fich.close();
-	return(-1);
+	else{
+		fich.close();
+		return(-1);
+	}
 }
 
 int comprobaridmaquinaexiste(string id){
 	string nom="maquinas.txt";
 	ifstream fich(nom);
-	string cad;
+	string cad1,cad2,cad3;
 	if(fich.is_open()){
-		while(getline(fich,cad,',')){
-			getline(fich,cad,',');
-			if(cad==id){
+		while(getline(fich,cad1,',')){
+			if(cad1==id){
 				fich.close();
 				return(1);
 			}
-			getline(fich,cad,'\n');
-		}
-	}
-	fich.close();
-	return(-1);
-}
-
-
-int compruebareservaescorrecta(Usuario a,Maquina x,int cantidadareservardenucleos,int cantidadareservarderams,int duraciondereserva,string date){
-	string nom="reservas.txt";
-	//formato:idusuario que hace la reserva,idmaquina sobre la que se reserva,fecha de reserva, duracion de esta,cantidad de nucleos, cantidad de rams
-	ifstream fich(nom);
-	string cad1,cad2,cad3,cad4,cad5,cad6;
-
-	if(fich.is_open()){
-		int p=comprobaridusuarioexiste(a.getId());
-		if(p=-1){//no existe usuario con ese id
-			fich.close();
-			return(-1);
-		}
-		else{//usuario existe
-			p=comprobaridmaquinaexiste(x.getID_maquina());
-			if(p=-1){//no existe maquina con ese id
-				fich.close();
-				return(-2);		
-			}
-			else{//usuario y maquina existen
-				int cantidadreservadaderams=0;
-				int cantidadreservadadenucleos=0;
-				ofstream fich2("temporal.txt");
-				while(getline(fich,cad1,',')){
-					if(cad1==a.getId()){
-						getline(fich,cad2,',');
-						getline(fich,cad3,',');
-						getline(fich,cad4,',');
-						getline(fich,cad5,',');//cantidad de nucleos reservados
-						cantidadreservadadenucleos=cantidadreservadadenucleos+atoi(cad5.c_str());
-						if(cantidadreservadadenucleos>=maxcantnucleos){
-							fich.close();
-							fich2.close();
-							remove("temporal.txt");
-							return(-3);//error el usuario ya ha reservado el maximo numero de nucleos
-
-						}
-						getline(fich,cad6,'\n');//cantidad de rams reservadas
-						cantidadreservadaderams=cantidadreservadaderams+atoi(cad6.c_str());
-						if(cantidadreservadaderams>=maxcantrams){
-							fich.close();
-							fich2.close();
-							remove("temporal.txt");
-							return(-4);//error el usuario ya ha reservado el máximo numero de rams 
-						} 
-						fich2<<cad1+','<<cad2+','<<cad3+','<<cad4+','<<cad5+','<<cad6+'\n'<<endl;
-					}
-					else{
-						getline(fich,cad2,',');
-						getline(fich,cad3,',');
-						getline(fich,cad4,',');
-						getline(fich,cad5,',');
-						getline(fich,cad6,'\n');
-						fich2<<cad1+','<<cad2+','<<cad3+','<<cad4+','<<cad5+','<<cad6+'\n'<<endl;
-					}
-				}
-				if(x.getNucleos()<cantidadreservadadenucleos){
-					fich.close();
-					fich2.close();
-					remove("temporal.txt");
-					return(-5);//nucleos de la maquina insuficientes
-				}
-				if(x.getRams()<cantidadareservarderams){
-					fich.close();
-					fich2.close();
-					remove("temporal.txt");
-					return(-6);//rams de la maquina insuficientes
-				}
-				if(cantidadareservardenucleos+cantidadreservadadenucleos>maxcantnucleos){
-					fich.close();
-					fich2.close();
-					remove("temporal.txt");
-					return(-7);//se quiere reservar más cantidad de nucleos de los disponibles					
-				}
-				if(cantidadreservadaderams+cantidadareservarderams>maxcantrams){
-					fich.close();
-					fich2.close();
-					remove("temporal.txt");
-					return(-8);//se quiere reservar más cantidad de ram de los disponibles
-				}
-				ifstream fich5("maquinasyrecursosdisponibles.txt");
-				int t,y;
-				while(getline(fich5,cad1,',')){
-					if(cad1==x.getID_maquina()){
-						getline(fich5,cad2,',');
-						t=atoi(cad2.c_str());
-						getline(fich5,cad3,'\n');
-						y=atoi(cad3.c_str());
-						if(cantidadareservardenucleos>t){
-							fich5.close();
-							return(-11);//se supera el maximo de lo disponible de la máquina en cuanto a nucleos
-						}
-						if(cantidadareservarderams>y){
-							fich5.close();
-							return(-12);//se supera el maximo de lo disponible de la maquina en cuanto a rams
-						}
-					}
-					else{
-						fich5.close();
-						return(-13);//maquina no disponible
-					}
-				}
-				fich2<<a.getId()+','<<x.getID_maquina()+','<<date+','<<duraciondereserva<<','<<cantidadareservardenucleos<<','<<cantidadareservarderams<<'\n'<<endl;
-				fich.close();
-				fich2.close();
-				remove(nom.c_str());
-				rename("temporal.txt",nom.c_str());
-				fich5.close();
-				ifstream fich3("maquinasyrecursosdisponibles.txt");//inicialmente este fichero y el de máquinas serán iguales
-				int nuevosnucleos,nuevasrams;
-				if(fich3.is_open()){
-					ofstream fich4("temp.txt");
-					while(getline(fich3,cad1,',')){
-						if(x.getID_maquina()==cad1){
-							getline(fich3,cad2,',');//cantidad de nucleos
-							nuevosnucleos=atoi(cad2.c_str())-cantidadareservardenucleos;
-							getline(fich3,cad3,'\n');//cantidad de rams
-							nuevasrams=atoi(cad3.c_str())-cantidadareservarderams;
-							if((nuevosnucleos>0 && nuevasrams>0)||(nuevosnucleos==0 && nuevasrams>0)||(nuevosnucleos>0 && nuevasrams==0)){
-								fich4<<cad1+','<<nuevosnucleos<<','<<nuevasrams<<'\n'<<endl;
-							}
-						}
-						else{
-							getline(fich3,cad2,',');
-							getline(fich3,cad3,'\n');
-							fich4<<cad1+','<<cad2+','<<cad3+'\n'<<endl;
-						}
-					}
-					fich3.close();
-					fich4.close();
-					remove("maquinasyrecursosdisponibles.txt");
-					rename("temp.txt","maquinasyrecursosdisponibles.txt");
-					return(1);
-				}
-				else{
-					ofstream fich3("maquinasyrecursosdisponibles");
-					return(-10);//no existe el fichero maquinas y recursos disponibles
-				}
-			}
+			getline(fich,cad2,',');
+			getline(fich,cad3,'\n');
 		}
 	}
 	else{
 		ofstream fich(nom);
-		return(-9);//no existe el fichero reservas
+		return(-1);
 	}
+}
 
+int nlineas(string nom){
+	ifstream fich(nom);
+	int n=0;
+	string cad;
+	while(getline(fich,cad)){
+		n++;
+	}
+	return n;
 }
 
 bool Reservas::addReserva(Usuario a,Maquina x,int cantidadareservardenucleos,int cantidadareservarderams,int duraciondereserva,string date){
-	int n=compruebareservaescorrecta(a,x,cantidadareservardenucleos,cantidadareservarderams,duraciondereserva,date);
-	if(n=1){
-		cout<<"Reserva hecha con exito\n"<<endl;
-		return(true);
+	string nom="reservas.txt";
+	//formato:idusuario que hace la reserva,idmaquina sobre la que se reserva,fecha de reserva, duracion de esta,cantidad de nucleos, cantidad de rams
+	ifstream fich(nom);
+	string cad1,cad2,cad3,cad4,cad5,cad6;
+	int i=0;
+	if(fich.is_open()){
+		int p;
+		p=comprobaridmaquinaexiste(x.getID_maquina());
+		if(p=1){
+			int cantidadreservadaderams=0;
+			int cantidadreservadadenucleos=0;
+			ofstream fich2("temporal.txt");//fich2 temporalde reservas
+			int nlin=nlineas(nom);
+			for(i=0;i<nlin;i++){
+				getline(fich,cad1,',');
+			
+				if(cad1==a.getId()){
+					getline(fich,cad2,',');
+					getline(fich,cad3,',');
+					getline(fich,cad4,',');
+					getline(fich,cad5,',');//cantidad de nucleos reservados
+					cantidadreservadadenucleos=cantidadreservadadenucleos+atoi(cad5.c_str());
+					if(cantidadreservadadenucleos>=maxcantnucleos){
+						fich.close();
+						fich2.close();
+						remove("temporal.txt");
+						cout<<"El usuario ya ha reservado el maximo numero de nucleos"<<endl;
+						return(false);//error el usuario ya ha reservado el maximo numero de nucleos
+
+					}
+					getline(fich,cad6,'\n');//cantidad de rams reservadas
+					cantidadreservadaderams=cantidadreservadaderams+atoi(cad6.c_str());
+					if(cantidadreservadaderams>=maxcantrams){
+						fich.close();
+						fich2.close();
+						remove("temporal.txt");
+						cout<<"El usuario ha reservado el numero maximo de rams"<<endl;
+						return(false);//error el usuario ya ha reservado el máximo numero de rams 
+					} 
+					fich2<<cad1+','<<cad2+','<<cad3+','<<cad4+','<<cad5+','<<cad6<<endl;
+				}
+				else{
+					getline(fich,cad2,',');
+					getline(fich,cad3,',');
+					getline(fich,cad4,',');
+					getline(fich,cad5,',');
+					getline(fich,cad6,'\n');
+					fich2<<cad1+','<<cad2+','<<cad3+','<<cad4+','<<cad5+','<<cad6<<endl;
+				}
+			}
+			if(x.getNucleos()<cantidadareservardenucleos){
+				fich.close();
+				fich2.close();
+				remove("temporal.txt");
+				cout<<"La maquina no tiene suficientes nucleos"<<endl;
+				return(false);//nucleos de la maquina insuficientes
+			}
+			if(x.getRams()<cantidadareservarderams){
+				fich.close();
+				fich2.close();
+				remove("temporal.txt");
+				cout<<"La maquina no tiene suficientes rams"<<endl;
+				return(false);//rams de la maquina insuficientes
+			}
+			if(cantidadareservardenucleos+cantidadreservadadenucleos>maxcantnucleos){
+				fich.close();
+				fich2.close();
+				remove("temporal.txt");
+				cout<<"Esta intentando reservar mas nucleos de los disponibles"<<endl;
+				return(false);//se quiere reservar más cantidad de nucleos de los disponibles					
+			}
+			if(cantidadreservadaderams+cantidadareservarderams>maxcantrams){
+				fich.close();
+				fich2.close();
+				remove("temporal.txt");
+				cout<<"Esta intentando reservar mas rams de las disponibles"<<endl;
+				return(false);//se quiere reservar más cantidad de ram de los disponibles
+			}
+			fich2<<a.getId()+','<<x.getID_maquina()+','<<date+','<<duraciondereserva<<','<<cantidadareservardenucleos<<','<<cantidadareservarderams<<endl;
+			fich.close();
+			fich2.close();
+			remove(nom.c_str());
+			rename("temporal.txt",nom.c_str());
+			ifstream fich3("maquinas.txt");//inicialmente este fichero y el de máquinas serán iguales
+			int nuevosnucleos,nuevasrams;
+			if(fich3.is_open()){
+				ofstream fich4("temp.txt");
+				nlin=nlineas("maquinas.txt");
+				for(i=0;i<nlin;i++){
+					getline(fich3,cad1,',');
+					if(x.getID_maquina()==cad1){
+						getline(fich3,cad2,',');//cantidad de nucleos
+						nuevosnucleos=atoi(cad2.c_str())-cantidadareservardenucleos;
+						getline(fich3,cad3,'\n');//cantidad de rams
+						nuevasrams=atoi(cad3.c_str())-cantidadareservarderams;
+						if((nuevosnucleos>0 && nuevasrams>0)||(nuevosnucleos==0 && nuevasrams>0)||(nuevosnucleos>0 && nuevasrams==0)){
+							fich4<<cad1+','<<nuevosnucleos<<','<<nuevasrams<<endl;
+						}
+					}
+					else{
+						getline(fich3,cad2,',');
+						getline(fich3,cad3,'\n');
+						fich4<<cad1+','<<cad2+','<<cad3<<endl;
+					}
+				}
+				fich3.close();
+				fich4.close();
+				remove("maquinas.txt");
+				rename("temp.txt","maquinas.txt");
+				cout<<"Reserva hecha"<<endl;
+				return(true);
+			}
+			else{
+				ofstream fich3("maquinas.txt");
+				cout<<"No existe el fichero maquinas"<<endl;
+				return(false);//no existe el fichero maquinas y recursos disponibles
+			}	
+		}
+		else{
+			fich.close();
+			cout<<"No existe maquina con este id"<<endl;
+			return(false);	
+		}
 	}
 	else{
-		if(n=-1){
-			cout<<"El usuario no existe\n"<<endl;
-			return(false);
-		}
-		if(n=-2){
-			cout<<"La maquina no existe\n"<<endl;
-
-			return(false);
-		}
-		if(n=-3){
-			cout<<"El usuario ha reservado ya el maximo de nucleos\n"<<endl;
-			return(false);
-		}
-		if(n=-4){
-			cout<<"El usuario ha reservado ya el maximo de rams\n"<<endl;
-			return(false);
-		}
-		if(n=-5){
-			cout<<"El usuario esta intentando reservar un numero mayor a los nucleos disponibles de la maquina\n"<<endl;			
-			return(false);
-		}
-		if(n=-6){
-			cout<<"El usuario esta intentando reservar un numero mayor a las rams disponibles de la maquina\n"<<endl;
-			return(false);
-		}
-		if(n=-7){
-			cout<<"Se quiere reservar más cantidad de nucleos de los disponibles\n"<<endl;
-			return(false);
-		}	
-		if(n=-8){
-			cout<<"Se quiere reservar más cantidad de ram de las disponibles\n"<<endl;
-			return(false);
-		}
-		if(n=-9){
-			cout<<"No existe el fichero reservas\n"<<endl;
-			return(false);
-		}
-		if(n=-10){
-			cout<<"No existe el fichero maquinas y recursos disponibles\n"<<endl;
-			return(false);
-		}	
-		if(n=-11){
-			cout<<"Se supera el maximo de lo disponible de la máquina en cuanto a nucleos\n"<<endl;
-			return(false);
-		}	
-		if(n=-12){
-			cout<<"Se supera el maximo de lo disponible de la máquina en cuanto a rams\n"<<endl;
-			return(false);
-		}	
-		if(n=-13){
-			cout<<"Maquina no disponible\n"<<endl;
-			return(false);
-		}	
+		ofstream fich(nom);
+		cout<<"No existe el fichero reservas"<<endl;
+		return(false);//no existe el fichero reservas
 	}
 }
 
@@ -266,7 +201,7 @@ int Reservas::moodReserva(Usuario a,Maquina x){
 		cout<<"El usuario no existe\n"<<endl;
 		return(-3);
 	}
-	string nom="resrevas.txt";
+	string nom="reservas.txt";
 	//formato:idusuario que hace la reserva,idmaquina sobre la que se reserva,fecha de reserva, duracion de esta,cantidad de nucleos, cantidad de rams
 	ifstream fich(nom);
 	string cad1,cad2,cad3,cad4,cad5,cad6;
