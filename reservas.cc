@@ -75,7 +75,6 @@ bool comprobarfechaa(string fech){
 		cout<<"Febrero no tiene mas de 28 dias\n"<<endl;
 		return false;
 	}
-	cout<<"Fecha correcta\n"<<endl;
 	return true;
 }
 
