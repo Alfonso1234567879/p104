@@ -3,7 +3,7 @@
 #include "admin_maquina.h"
 #include "reservas.h"
 #include<gtest/gtest.h>
-#include"ej.cc"
+#include"admin_users.cc"
 #include <fstream>
 
 TEST(Usuario,prueba1){
