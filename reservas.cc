@@ -5,6 +5,80 @@
 #include"reservas.h"
 using namespace std;
 
+bool comprobarfechaa(string fech){
+	if(fech.length()!=10){
+		cout<<"Formato incorrecto, la longitud de la fecha debe de ser 10 digitos contando los caracteres separadores\n"<<endl;
+		return false;
+	}
+	if(fech[2]!=fech[5]){
+		cout<<"Los separadores deben de ser iguales\n"<<endl;
+		return false;
+	}
+	if(fech[2]!='/' && fech[2]!='-'){
+		cout<<"Los separadores solo pueden ser / o - de otra forma sera incorrecto\n"<<endl;
+		return false;
+	}
+	string dia,mes,anio;
+
+	dia=fech.substr(0,2);
+	if(dia.length()!=2){
+		cout<<"Tiene que introducir 2 digitos para el dia\n"<<endl;
+		return false;
+	}
+	int d,m,a;
+	mes=fech.substr(3,2);
+	if(mes.length()!=2){
+		cout<<"Tiene que introducir 2 digitos para el mes\n"<<endl;
+		return false;
+	}
+	anio=fech.substr(6);
+	if(anio.length()!=4){
+		cout<<"Tiene que introducir 4 digitos para el anio\n"<<endl;
+		return false;
+	}
+	if(!isdigit(dia[0]) || !isdigit(dia[1])){
+		cout<<"Tiene que introducir 2 digitos numericos para el dia\n"<<endl;
+		return false;
+	}
+	d=atoi(dia.c_str());
+	if(!isdigit(mes[0]) || !isdigit(mes[1])){
+		cout<<"Tiene que introducir 2 digitos numericos para el mes\n"<<endl;
+		return false;
+	}
+	m=atoi(mes.c_str());
+	if(!isdigit(anio[0]) || !isdigit(anio[1]) || !isdigit(anio[2]) || !isdigit(anio[3])){
+		cout<<"Tiene que introducir 4 digitos numericos para el anio\n"<<endl;
+		return false;
+	}
+	a=atoi(anio.c_str());
+	if(m>12 || m<0){
+		cout<<"Fecha incorrecta, mes no valido\n"<<endl;
+		return false;
+	}
+	if(a!=2021){
+		cout<<"El año debe de ser el actual (2021)\n"<<endl;
+		return false;
+	}
+	if(d<0){
+		cout<<"El dia debe de ser mayor de 0\n"<<endl;
+		return false;
+	}
+	if(((m==1 && d>31) || (m==3 && d>31) || (m==5 && d>31) || (m==7 && d>31) || (m==9 && d>31) || (m==11 && d>31))){
+		cout<<"Este mes no puede tener mas de 31 dias\n"<<endl;
+		return false;
+	}
+	if((m==4 && d>30) || (m==6 && d>30) || (m==8 && d>30) || (m==10 && d>30) || (m==12 && d>30)){
+		cout<<"Este mes no puede tener mas de 30 dias\n"<<endl;
+		return false;
+	}
+	if(m==2 && d>28){
+		cout<<"Febrero no tiene mas de 28 dias\n"<<endl;
+		return false;
+	}
+	cout<<"Fecha correcta\n"<<endl;
+	return true;
+}
+
 int maxcantrams=7;//cantidad maxima de rams que puede reservar un usuario
 int maxcantnucleos=6;//cantidad maxima de nucleos que puede reservar un usuario
 
@@ -59,6 +133,18 @@ int nlineas(string nom){
 }
 
 bool Reservas::addReserva(Usuario a,Maquina x,int cantidadareservardenucleos,int cantidadareservarderams,int duraciondereserva,string date){
+	if(cantidadareservarderams<0){
+		return false;
+	}
+	if(cantidadareservardenucleos<0){
+		return false;
+	}
+	if(duraciondereserva>7 || duraciondereserva<0){
+		return false;
+	}
+	bool checkfech;
+	checkfech=comprobarfechaa(date);
+	if(checkfech==false){return false;}
 	string nom="reservas.txt";
 	//formato:idusuario que hace la reserva,idmaquina sobre la que se reserva,fecha de reserva, duracion de esta,cantidad de nucleos, cantidad de rams
 	ifstream fich(nom);

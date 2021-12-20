@@ -51,6 +51,12 @@ bool AdminMaq::addMaq(Maquina a){
 		cout<<"La maquina con el id introducido ya existe\n"<<endl;
 		return false;
 	}
+	if(a.getNucleos()<0){
+		return false;
+	}
+	if(a.getRams()<0){
+		return false;
+	}
 	string nom="maquinas.txt";
 	//formato:idmaquina,nucleos,rams \n
 	ifstream fich(nom);

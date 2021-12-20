@@ -5,6 +5,33 @@
 #include"admin_users.h"
 using namespace std;
 
+bool comprobardnii(string dni){
+	string numeros,letra;
+	if(dni.length()!=9){
+		cout<<"Error el dni debe tener 9 digitos, 8 numeros 1 letra\n"<<endl;
+		return false;
+	}
+	numeros=dni.substr(0,8);
+	letra=dni.substr(8,1);
+	if(!isdigit(numeros[0]) || !isdigit(numeros[1]) || !isdigit(numeros[2]) || !isdigit(numeros[3]) || !isdigit(numeros[4]) || !isdigit(numeros[5]) || !isdigit(numeros[6]) || !isdigit(numeros[7])){
+		cout<<"Los numeros estan mal introducidos, deben ser 8 numeros y no cualquier otro caracter\n"<<endl;
+		return false;
+	}
+	if(isdigit(letra[0])){
+		cout<<"La letra no puede ser un numero\n"<<endl;
+		return false;
+	}
+	if(!isalpha(letra[0])){
+		cout<<"La letra debe ser un caracter\n"<<endl;
+		return false;
+	}
+	if(toupper(letra[0])!=letra[0]){
+		cout<<"La letra debe ser mayuscula\n"<<endl;
+		return false;
+	}
+	return true;
+}
+
 int nlineass(string nom){
 	ifstream fich(nom);
 	int n=0;
@@ -126,6 +153,11 @@ int comprobaridnoexisteenadminmaquina(string id){
 
 bool AdminUsers::addUsuario(Usuario a){
 	int dnn=comprobardninoexiste(a.getDni());
+	bool buendni;
+	buendni=comprobardnii(a.getDni());
+	if(buendni==false){
+		return false;
+	}
 	if(dnn==-1){
 		cout<<"dni perteneciente a otro usuario\n"<<endl;
 		return false;
